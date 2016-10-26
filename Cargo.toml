@@ -1,0 +1,9 @@
+[package]
+name = "keep"
+version = "0.1.0"
+authors = ["Nathan Sizemore <nathanrsizemore@gmail.com>"]
+
+[dependencies]
+docopt = "^0.6"
+rustc-serialize = "^0.3"
+sqlite = "^0.23"
