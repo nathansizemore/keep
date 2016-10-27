@@ -8,6 +8,7 @@
 use std::env;
 use std::fs::OpenOptions;
 use std::path::Path;
+use std::process;
 
 use sqlite;
 
@@ -16,8 +17,38 @@ const DB_NAME: &'static str = "keep.db";
 const CUST_KEEP_DB: &'static str = "KEEP_DB";
 
 
+lazy_static! {
+    static ref DB_PATH_STR: String = {
+        // Check for custom install location
+        let custom_result = env::var(CUST_KEEP_DB);
+        if custom_result.is_ok() {
+            return custom_result.unwrap() + "/" + DB_NAME;
+        }
+
+        // UNIX users first
+        let unix_result = env::var("HOME");
+        if unix_result.is_ok() {
+            return unix_result.unwrap() + "/" + DB_NAME;
+        }
+
+        // Windows users second
+        let win_result = env::var("HOMEPATH");
+        if win_result.is_ok() {
+            let home_drive = env::var("HOMEDRIVE").unwrap();
+            let home = win_result.unwrap() + &home_drive + "/" + DB_NAME;
+            return home;
+        }
+
+        // Display error message and close
+        println!("Could not locate HOME, HOMEPATH, or KEEP_DB");
+        println!("Please define KEEP_DB as the storage directory.");
+        process::exit(0);
+    };
+}
+
+
 pub fn insert(item: &String) {
-    if !init() { return; }
+    init();
 
     let query = format!("INSERT INTO stuff (tag, item) VALUES ('', '{}');",
                         item);
@@ -25,7 +56,7 @@ pub fn insert(item: &String) {
 }
 
 pub fn insert_with_tag(tag: &String, item: &String) {
-    if !init() { return; }
+    init();
 
     let query = format!("INSERT INTO stuff (tag, item) VALUES ('{}', '{}');",
                         tag,
@@ -34,14 +65,10 @@ pub fn insert_with_tag(tag: &String, item: &String) {
 }
 
 pub fn list_all() {
-    if !init() { return; }
-
-    let db_dir = get_home_dir().unwrap();
-    let db_path_str = get_db_path(&db_dir);
-    let db_path = Path::new(&db_path_str);
+    init();
 
     let query = format!("SELECT * FROM stuff;");
-    let c = sqlite::open(&db_path).unwrap();
+    let c = sqlite::open(&Path::new(&*DB_PATH_STR)).unwrap();
     let mut cursor = c.prepare(query).unwrap().cursor();
     while let Some(row) = cursor.next().unwrap() {
         println!("{}", row[1].as_string().unwrap());
@@ -49,97 +76,41 @@ pub fn list_all() {
 }
 
 pub fn list_with_tag(tag: &String) {
-    if !init() { return; }
-
-    let db_dir = get_home_dir().unwrap();
-    let db_path_str = get_db_path(&db_dir);
-    let db_path = Path::new(&db_path_str);
+    init();
 
     let query = format!("SELECT * FROM stuff WHERE tag='{}';", tag);
-    let c = sqlite::open(&db_path).unwrap();
+    let c = sqlite::open(&Path::new(&*DB_PATH_STR)).unwrap();
     let mut cursor = c.prepare(query).unwrap().cursor();
     while let Some(row) = cursor.next().unwrap() {
         println!("{}", row[1].as_string().unwrap());
     }
 }
 
-fn init() -> bool {
-    let db_dir_res = get_home_dir();
-    if db_dir_res.is_err() { return false; }
-
-    let db_dir = db_dir_res.unwrap();
-    create_db_if_not_exists(&db_dir);
-
-    true
+fn init() {
+    create_db_if_not_exists();
 }
 
-fn get_home_dir() -> Result<String, ()> {
-    // Check for custom install location
-    let custom_result = env::var(CUST_KEEP_DB);
-    if custom_result.is_ok() {
-        let home = custom_result.unwrap();
-        return Ok(home);
-    }
-
-    // UNIX users first
-    let unix_result = env::var("HOME");
-    if unix_result.is_ok() {
-        let home = unix_result.unwrap();
-        return Ok(home);
-    }
-
-    // Windows users second
-    let win_result = env::var("HOMEPATH");
-    if win_result.is_ok() {
-        let home_drive = env::var("HOMEDRIVE").unwrap();
-        let home = win_result.unwrap() + &home_drive;
-        return Ok(home);
-    }
-
-    // Display error message and close
-    println!("Could not locate HOME, HOMEPATH, or KEEP_DB");
-    println!("Please define KEEP_DB as the storage directory.");
-    Err(())
-}
-
-
-fn create_db_if_not_exists(db_dir: &String) {
-    let mut db_path_s = String::new();
-    db_path_s.push_str(db_dir);
-    db_path_s.push_str("/");
-    db_path_s.push_str(DB_NAME);
-
-    let db_path = Path::new(&db_path_s);
+fn create_db_if_not_exists() {
+    let db_path = Path::new(&*DB_PATH_STR);
     if db_path.exists() { return; }
-    create_db_file(&db_path);
-    initialize_db(&db_path);
+
+    create_db_file();
+    initialize_db();
 }
 
-fn create_db_file(path: &Path) {
+fn create_db_file() {
     let mut opts = OpenOptions::new();
-    let _ = opts.append(true).create(true).open(path).map_err(|e| {
+    let _ = opts.append(true).create(true).open(&Path::new(&*DB_PATH_STR)).map_err(|e| {
         println!("Error creating db: {}", e)
     });
 }
 
-fn initialize_db(path: &Path) {
-    let c = sqlite::open(path).unwrap();
+fn initialize_db() {
+    let c = sqlite::open(Path::new(&*DB_PATH_STR)).unwrap();
     let _ = c.execute("CREATE TABLE stuff (tag TEXT, item TEXT);").unwrap();
 }
 
-fn get_db_path(db_dir: &String) -> String {
-    let mut db_path_s = String::new();
-    db_path_s.push_str(db_dir);
-    db_path_s.push_str("/");
-    db_path_s.push_str(DB_NAME);
-    db_path_s
-}
-
 fn execute_query(q: String) {
-    let db_dir = get_home_dir().unwrap();
-    let db_path_str = get_db_path(&db_dir);
-    let db_path = Path::new(&db_path_str);
-
-    let c = sqlite::open(&db_path).unwrap();
+    let c = sqlite::open(&Path::new(&*DB_PATH_STR)).unwrap();
     let _ = c.execute(q).unwrap();
 }

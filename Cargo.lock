@@ -3,6 +3,7 @@ name = "keep"
 version = "0.1.0"
 dependencies = [
  "docopt 0.6.86 (registry+https://github.com/rust-lang/crates.io-index)",
+ "lazy_static 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "rustc-serialize 0.3.19 (registry+https://github.com/rust-lang/crates.io-index)",
  "sqlite 0.23.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]

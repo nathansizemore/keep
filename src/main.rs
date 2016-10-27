@@ -6,6 +6,7 @@
 
 
 extern crate docopt;
+#[macro_use] extern crate lazy_static;
 extern crate rustc_serialize;
 extern crate sqlite;
 
