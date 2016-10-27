@@ -25,9 +25,9 @@ Usage:
     keep --version
 
 Options:
+    -t --tag=<t>    Name to help identify item.
     -h --help       Show this screen.
     --version       Show version.
-    -t --tag=<t>    Name to help identify item.
 ";
 
 const VERSION_STR: &'static str = "keep 0.1.0
