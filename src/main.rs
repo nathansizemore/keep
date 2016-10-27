@@ -19,16 +19,15 @@ const USAGE: &'static str = "
 keep - it keeps shit, so you can look at it later
 
 Usage:
-    keep [--tag=<t>] <item>
-    keep list
+    keep save [--tag=<t>] <item>
     keep list [--tag=<t>]
-    keep --help
+    keep -h | --help
     keep --version
 
 Options:
-    --help       Show this screen.
-    --version    Show version.
-    --tag=<t>    Name to help identify item.
+    -h --help       Show this screen.
+    --version       Show version.
+    -t --tag=<t>    Name to help identify item.
 ";
 
 const VERSION_STR: &'static str = "keep 0.1.0
@@ -41,8 +40,9 @@ This is free software: you are free to change and redistribute it.";
 pub struct Args {
     pub flag_tag: String,
     pub flag_version: bool,
+    pub cmd_save: bool,
+    pub cmd_list: bool,
     pub arg_item: String,
-    pub cmd_list: bool
 }
 
 
@@ -54,18 +54,30 @@ fn main() {
 }
 
 fn handle_input(args: &Args) {
-    println!("{:?}", args);
+    // println!("{:?}", args);
 
     if args.flag_version {
         println!("{}", VERSION_STR);
         return;
     }
 
-    if !args.cmd_list {
+    // Insert op
+    if args.cmd_save {
         if args.flag_tag.len() > 0 {
             db::insert_with_tag(&args.flag_tag, &args.arg_item);
         } else {
             db::insert(&args.arg_item);
+        }
+        return;
+    }
+
+    // List op
+    if args.cmd_list {
+        // Tagged
+        if args.flag_tag.len() > 0 {
+            db::list_with_tag(&args.flag_tag);
+        } else {
+            db::list_all();
         }
         return;
     }

@@ -19,17 +19,48 @@ const CUST_KEEP_DB: &'static str = "KEEP_DB";
 pub fn insert(item: &String) {
     if !init() { return; }
 
-    let db_dir = get_home_dir().unwrap();
-    let db_path_str = get_db_path(&db_dir);
-    let db_path = Path::new(&db_path_str);
-
-    let query = format!("INSERT INTO stuff (tag, item) VALUES ('', '{}');", item);
-    let c = sqlite::open(&db_path).unwrap();
-    let _ = c.execute(query).unwrap();
+    let query = format!("INSERT INTO stuff (tag, item) VALUES ('', '{}');",
+                        item);
+    execute_query(query);
 }
 
 pub fn insert_with_tag(tag: &String, item: &String) {
     if !init() { return; }
+
+    let query = format!("INSERT INTO stuff (tag, item) VALUES ('{}', '{}');",
+                        tag,
+                        item);
+    execute_query(query);
+}
+
+pub fn list_all() {
+    if !init() { return; }
+
+    let db_dir = get_home_dir().unwrap();
+    let db_path_str = get_db_path(&db_dir);
+    let db_path = Path::new(&db_path_str);
+
+    let query = format!("SELECT * FROM stuff;");
+    let c = sqlite::open(&db_path).unwrap();
+    let mut cursor = c.prepare(query).unwrap().cursor();
+    while let Some(row) = cursor.next().unwrap() {
+        println!("{}", row[1].as_string().unwrap());
+    }
+}
+
+pub fn list_with_tag(tag: &String) {
+    if !init() { return; }
+
+    let db_dir = get_home_dir().unwrap();
+    let db_path_str = get_db_path(&db_dir);
+    let db_path = Path::new(&db_path_str);
+
+    let query = format!("SELECT * FROM stuff WHERE tag='{}';", tag);
+    let c = sqlite::open(&db_path).unwrap();
+    let mut cursor = c.prepare(query).unwrap().cursor();
+    while let Some(row) = cursor.next().unwrap() {
+        println!("{}", row[1].as_string().unwrap());
+    }
 }
 
 fn init() -> bool {
@@ -102,4 +133,13 @@ fn get_db_path(db_dir: &String) -> String {
     db_path_s.push_str("/");
     db_path_s.push_str(DB_NAME);
     db_path_s
+}
+
+fn execute_query(q: String) {
+    let db_dir = get_home_dir().unwrap();
+    let db_path_str = get_db_path(&db_dir);
+    let db_path = Path::new(&db_path_str);
+
+    let c = sqlite::open(&db_path).unwrap();
+    let _ = c.execute(q).unwrap();
 }
