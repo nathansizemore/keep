@@ -1,6 +1,6 @@
 # keep [<img src="https://travis-ci.org/nathansizemore/keep.svg?branch=master">][travis-badge]
 
-Simple, lightweight storage option.
+Simple, lightweight storage and retrieval program.
 
 ---
 
