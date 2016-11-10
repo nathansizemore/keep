@@ -23,10 +23,12 @@ keep - it keeps shit, so you can look at it later
 Usage:
     keep save [--tag=<t>] <item>
     keep list [--tag=<t>]
+    keep rm [--all] [--tag=<t>] [<id>]
     keep -h | --help
     keep --version
 
 Options:
+    -a --all        Apply command to every entry.
     -t --tag=<t>    Name to help identify item.
     -h --help       Show this screen.
     --version       Show version.
@@ -40,10 +42,12 @@ This is free software: you are free to change and redistribute it.";
 
 #[derive(Debug, RustcDecodable)]
 pub struct Args {
+    pub flag_all: bool,
     pub flag_tag: String,
     pub flag_version: bool,
     pub cmd_save: bool,
     pub cmd_list: bool,
+    pub cmd_rm: bool,
     pub arg_item: String,
 }
 
@@ -52,6 +56,9 @@ fn main() {
     let args: Args = Docopt::new(USAGE)
         .and_then(|d| d.decode())
         .unwrap_or_else(|e| e.exit());
+
+    db::init();
+
     handle_input(&args);
 }
 
