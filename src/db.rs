@@ -10,6 +10,7 @@ use std::fs::OpenOptions;
 use std::path::Path;
 use std::process;
 
+use pad::{PadStr, Alignment};
 use sqlite;
 
 
@@ -70,8 +71,35 @@ pub fn list_all() {
     let query = format!("SELECT * FROM stuff;");
     let c = sqlite::open(&Path::new(&*DB_PATH_STR)).unwrap();
     let mut cursor = c.prepare(query).unwrap().cursor();
+
+    let mut pad_id = 2; // "id"
+    let mut pad_tag = 3; // "tag"
+    let mut pad_item = 4; // "item"
+    let mut buf = Vec::<(String, String, String)>::new();
     while let Some(row) = cursor.next().unwrap() {
-        println!("{}", row[1].as_string().unwrap());
+        let id = format!("{}", row[0].as_integer().unwrap());
+        let tag = row[1].as_string().unwrap().to_owned();
+        let item = row[2].as_string().unwrap().to_owned();
+
+        if id.len() > pad_id { pad_id = id.len(); }
+        if tag.len() > pad_tag { pad_tag = tag.len(); }
+        if item.len() > pad_item { pad_item = item.len(); }
+
+        buf.push((id, tag, item));
+    }
+
+    if buf.len() > 0 {
+        println!("| {} | {} | {} |",
+                 "id".pad_to_width_with_alignment(pad_id, Alignment::Middle),
+                 "tag".pad_to_width_with_alignment(pad_tag, Alignment::Middle),
+                 "item".pad_to_width_with_alignment(pad_item, Alignment::Middle));
+    }
+
+    for (id, tag, item) in buf {
+        println!("| {} | {} | {} |",
+                 id.pad_to_width(pad_id),
+                 tag.pad_to_width(pad_tag),
+                 item.pad_to_width(pad_item));
     }
 }
 
@@ -81,8 +109,30 @@ pub fn list_with_tag(tag: &String) {
     let query = format!("SELECT * FROM stuff WHERE tag='{}';", tag);
     let c = sqlite::open(&Path::new(&*DB_PATH_STR)).unwrap();
     let mut cursor = c.prepare(query).unwrap().cursor();
+
+    let mut pad_id = 2; // "id"
+    let mut pad_item = 4; // "item"
+    let mut buf = Vec::<(String, String)>::new();
     while let Some(row) = cursor.next().unwrap() {
-        println!("{}", row[1].as_string().unwrap());
+        let id = format!("{}", row[0].as_integer().unwrap());
+        let item = row[2].as_string().unwrap().to_owned();
+
+        if id.len() > pad_id { pad_id = id.len(); }
+        if item.len() > pad_item { pad_item = item.len(); }
+
+        buf.push((id, item));
+    }
+
+    if buf.len() > 0 {
+        println!("| {} | {} |",
+                 "id".pad_to_width_with_alignment(pad_id, Alignment::Middle),
+                 "item".pad_to_width_with_alignment(pad_item, Alignment::Middle));
+    }
+
+    for (id, item) in buf {
+        println!("| {} | {} |",
+                 id.pad_to_width(pad_id),
+                 item.pad_to_width(pad_item));
     }
 }
 
@@ -106,8 +156,13 @@ fn create_db_file() {
 }
 
 fn initialize_db() {
+    let statement = "CREATE TABLE stuff (
+	id	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
+	tag	TEXT NOT NULL,
+	item	TEXT NOT NULL);";
+
     let c = sqlite::open(Path::new(&*DB_PATH_STR)).unwrap();
-    let _ = c.execute("CREATE TABLE stuff (tag TEXT, item TEXT);").unwrap();
+    let _ = c.execute(statement).unwrap();
 }
 
 fn execute_query(q: String) {
