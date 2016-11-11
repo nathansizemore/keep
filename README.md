@@ -15,10 +15,12 @@ keep - it keeps shit, so you can look at it later
 Usage:
     keep save [--tag=<t>] <item>
     keep list [--tag=<t>]
+    keep rm [--all] [--tag=<t>] [<id>]
     keep -h | --help
     keep --version
 
 Options:
+    -a --all        Apply command to every entry.
     -t --tag=<t>    Name to help identify item.
     -h --help       Show this screen.
     --version       Show version.
