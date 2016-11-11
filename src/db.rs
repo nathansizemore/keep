@@ -133,6 +133,7 @@ fn create_table_version() {
         version    TEXT NOT NULL);".to_owned();
 
     execute_query(statement_version);
+    execute_query("INSERT INTO version (version) VALUES ('0.1.0');".to_owned());
 }
 
 fn create_table_stuff() {
