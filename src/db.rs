@@ -7,11 +7,11 @@
 
 use std::env;
 use std::fs::OpenOptions;
-use std::mem;
 use std::path::Path;
 use std::process;
 
-use pad::PadStr;
+use entry::Entry;
+
 use sqlite;
 
 
@@ -66,75 +66,45 @@ pub fn insert_with_tag(tag: &String, item: &String) {
     execute_query(query);
 }
 
-pub fn list_all() {
+pub fn get_all() -> Vec<Entry> {
     let query = format!("SELECT * FROM stuff;");
-    run_list_query(&query);
+    get_all_matching_query(&query)
 }
 
-pub fn list_with_tag(tag: &String) {
+pub fn get_with_tag(tag: &String) -> Vec<Entry> {
     let query = format!("SELECT * FROM stuff WHERE tag='{}';", tag);
-    run_list_query(&query);
+    get_all_matching_query(&query)
 }
 
-fn run_list_query(query: &String) {
-    let mut buf = get_all_matching_query(&query);
-    let (pad_id, pad_tag, pad_item) = get_padding(&buf);
-    pad_list(&mut buf, pad_id, pad_tag, pad_item);
-    print_buf(&buf);
+pub fn rm_with_tag(tag: &String) {
+    let query = format!("DELETE FROM stuff WHERE tag='{}';", tag);
+    execute_query(query);
 }
 
-fn get_all_matching_query(query: &String) -> Vec<(String, String, String)> {
+pub fn rm_with_id(id: u64) {
+    let query = format!("DELETE FROM stuff WHERE id={};", id);
+    execute_query(query);
+}
+
+pub fn rm_all() {
+    let query = format!("DELETE FROM stuff;");
+    execute_query(query);
+}
+
+fn get_all_matching_query(query: &String) -> Vec<Entry> {
     let c = sqlite::open(&Path::new(&*DB_PATH_STR)).unwrap();
     let mut cursor = c.prepare(query).unwrap().cursor();
 
-    let mut buf = Vec::<(String, String, String)>::new();
-    buf.push(("id".to_owned(), "tag".to_owned(), "item".to_owned()));
-
+    let mut buf = Vec::<Entry>::new();
     while let Some(row) = cursor.next().unwrap() {
-        let id = format!("{}", row[0].as_integer().unwrap());
-        let tag = row[1].as_string().unwrap().to_owned();
-        let item = row[2].as_string().unwrap().to_owned();
-
-        buf.push((id, tag, item));
+        buf.push(Entry {
+            id: row[0].as_integer().unwrap() as u64,
+            tag: row[1].as_string().unwrap().to_owned(),
+            item: row[2].as_string().unwrap().to_owned()
+        });
     }
 
     buf
-}
-
-fn get_padding(buf: &Vec<(String, String, String)>) -> (usize, usize, usize) {
-    let mut pad_id = 0;
-    let mut pad_tag = 0;
-    let mut pad_item = 0;
-
-    for &(ref id, ref tag, ref item) in buf {
-        if id.len() > pad_id { pad_id = id.len(); }
-        if tag.len() > pad_tag { pad_tag = tag.len(); }
-        if item.len() > pad_item { pad_item = item.len(); }
-    }
-
-    (pad_id, pad_tag, pad_item)
-}
-
-fn pad_list(buf: &mut Vec<(String, String, String)>,
-            pad_id: usize,
-            pad_tag: usize,
-            pad_item: usize)
-{
-    for &mut (ref mut id, ref mut tag, ref mut item) in buf {
-        let new_id = id.pad_to_width(pad_id);
-        let new_tag = tag.pad_to_width(pad_tag);
-        let new_item = item.pad_to_width(pad_item);
-
-        mem::replace(id, new_id);
-        mem::replace(tag, new_tag);
-        mem::replace(item, new_item);
-    }
-}
-
-fn print_buf(buf: &Vec<(String, String, String)>) {
-    for &(ref id, ref tag, ref item) in buf {
-        println!("| {} | {} | {} |", id, tag, item);
-    }
 }
 
 fn create_db_if_not_exists() {

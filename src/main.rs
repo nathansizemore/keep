@@ -15,6 +15,8 @@ extern crate sqlite;
 use docopt::Docopt;
 
 mod db;
+mod entry;
+mod print;
 
 
 const USAGE: &'static str = "
@@ -49,6 +51,7 @@ pub struct Args {
     pub cmd_list: bool,
     pub cmd_rm: bool,
     pub arg_item: String,
+    pub arg_id: u64
 }
 
 
@@ -82,12 +85,24 @@ fn handle_input(args: &Args) {
 
     // List op
     if args.cmd_list {
-        // Tagged
-        if args.flag_tag.len() > 0 {
-            db::list_with_tag(&args.flag_tag);
+        let entries = if args.flag_tag.len() > 0 {
+            db::get_with_tag(&args.flag_tag)
         } else {
-            db::list_all();
-        }
+            db::get_all()
+        };
+
+        print::print_entries(entries);
         return;
+    }
+
+    // Remove op
+    if args.cmd_rm {
+        if args.flag_tag.len() > 0 { // By tag
+            db::rm_with_tag(&args.flag_tag);
+        } else if args.flag_all { // Everything
+            db::rm_all();
+        } else { // By id
+            db::rm_with_id(args.arg_id);
+        }
     }
 }
