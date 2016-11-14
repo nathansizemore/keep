@@ -6,6 +6,6 @@ authors = ["Nathan Sizemore <nathanrsizemore@gmail.com>"]
 [dependencies]
 docopt = "^0.6"
 lazy_static = "^0.2"
-pad = "0.1.4"
+pad = "^0.1"
 rustc-serialize = "^0.3"
 sqlite = "^0.23"
