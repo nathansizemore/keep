@@ -36,9 +36,15 @@ lazy_static! {
         // Windows users second
         let win_result = env::var("HOMEPATH");
         if win_result.is_ok() {
-            let home_drive = env::var("HOMEDRIVE").unwrap();
-            let home = win_result.unwrap() + &home_drive + "/" + DB_NAME;
-            return home;
+            let drive_result = env::var("HOMEDRIVE");
+            if drive_result.is_ok() {
+                let mut home = String::new();
+                home.push_str(&drive_result.unwrap());
+                home.push_str(&win_result.unwrap());
+                home.push_str("\\");
+                home.push_str(DB_NAME);
+                return home;
+            }
         }
 
         // Display error message and close
