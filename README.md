@@ -1,6 +1,6 @@
 # keep [<img src="https://travis-ci.org/nathansizemore/keep.svg?branch=master">][travis-badge]
 
-Simple, lightweight storage and retrieval program.
+Simple lightweight storage and retrieval program.
 
 ---
 
@@ -9,8 +9,13 @@ Simple, lightweight storage and retrieval program.
 ```
 $ keep save --tag=todo "Fix all the bugs."
 
+$ keep list
+| id | tag  | item              |
+---------------------------------
+| 1  | todo | Fix all the bugs. |
+
 $ keep --help
-keep - it keeps shit, so you can look at it later
+keep - it keeps shit, so you can look at it later.
 
 Usage:
     keep save [--tag=<t>] <item>
