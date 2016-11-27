@@ -33,6 +33,15 @@ Options:
 
 ---
 
+## Install
+
+```
+cargo build --release
+cargo install
+```
+
+---
+
 ### Author
 
 Nathan Sizemore, nathanrsizemore@gmail.com
