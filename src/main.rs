@@ -20,7 +20,7 @@ mod print;
 
 
 const USAGE: &'static str = "
-keep - it keeps shit, so you can look at it later
+keep - it keeps shit, so you can look at it later.
 
 Usage:
     keep save [--tag=<t>] <item>
