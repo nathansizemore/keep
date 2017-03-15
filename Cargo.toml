@@ -4,7 +4,7 @@ version = "0.1.1"
 authors = ["Nathan Sizemore <nathanrsizemore@gmail.com>"]
 
 [dependencies]
-docopt = "^0.6"
+docopt = "^0.7"
 lazy_static = "^0.2"
 pad = "^0.1"
 rustc-serialize = "^0.3"
