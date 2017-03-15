@@ -36,7 +36,7 @@ Options:
     --version       Show version.
 ";
 
-const VERSION_STR: &'static str = "keep 0.1.1
+const VERSION_STR: &'static str = "keep 0.1.2
 
 Copyright (C) 2016 Nathan Sizemore <nathanrsizemore@gmail.com>
 License: MPL-2.0 https://www.mozilla.org/en-US/MPL/2.0
