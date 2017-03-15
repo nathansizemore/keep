@@ -25,7 +25,7 @@ dependencies = [
  "lazy_static 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "regex 0.1.80 (registry+https://github.com/rust-lang/crates.io-index)",
  "rustc-serialize 0.3.21 (registry+https://github.com/rust-lang/crates.io-index)",
- "strsim 0.5.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "strsim 0.5.2 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -124,7 +124,7 @@ dependencies = [
 
 [[package]]
 name = "strsim"
-version = "0.5.1"
+version = "0.5.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
@@ -180,7 +180,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 "checksum sqlite 0.23.1 (registry+https://github.com/rust-lang/crates.io-index)" = "c836bd858924dee909af40116ebd5a469b1c196204a376cf277cd9128122ac96"
 "checksum sqlite3-src 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)" = "f6d9d456ae741b07c60ede84b0fa85bafad8275b1bb95bb42a93805d7475313b"
 "checksum sqlite3-sys 0.11.1 (registry+https://github.com/rust-lang/crates.io-index)" = "2265dcf97c325725456e70bdfbbffb034b2f214964c065cbdea4b35e8647e63e"
-"checksum strsim 0.5.1 (registry+https://github.com/rust-lang/crates.io-index)" = "50c069df92e4b01425a8bf3576d5d417943a6a7272fbabaf5bd80b1aaa76442e"
+"checksum strsim 0.5.2 (registry+https://github.com/rust-lang/crates.io-index)" = "67f84c44fbb2f91db7fef94554e6b2ac05909c9c0b0bc23bb98d3a1aebfe7f7c"
 "checksum thread-id 2.0.0 (registry+https://github.com/rust-lang/crates.io-index)" = "a9539db560102d1cef46b8b78ce737ff0bb64e7e18d35b2a5688f7d097d0ff03"
 "checksum thread_local 0.2.7 (registry+https://github.com/rust-lang/crates.io-index)" = "8576dbbfcaef9641452d5cf0df9b0e7eeab7694956dd33bb61515fb8f18cfdd5"
 "checksum unicode-width 0.1.3 (registry+https://github.com/rust-lang/crates.io-index)" = "2d6722facc10989f63ee0e20a83cd4e1714a9ae11529403ac7e0afd069abc39e"
