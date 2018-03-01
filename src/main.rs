@@ -6,9 +6,11 @@
 
 
 extern crate docopt;
-#[macro_use] extern crate lazy_static;
+#[macro_use]
+extern crate lazy_static;
 extern crate pad;
-extern crate rustc_serialize;
+#[macro_use]
+extern crate serde_derive;
 extern crate sqlite;
 
 
@@ -42,7 +44,7 @@ Copyright (C) 2016 Nathan Sizemore <nathanrsizemore@gmail.com>
 License: MPL-2.0 https://www.mozilla.org/en-US/MPL/2.0
 This is free software: you are free to change and redistribute it.";
 
-#[derive(Debug, RustcDecodable)]
+#[derive(Debug, Deserialize)]
 pub struct Args {
     pub flag_all: bool,
     pub flag_tag: String,
@@ -57,7 +59,7 @@ pub struct Args {
 
 fn main() {
     let args: Args = Docopt::new(USAGE)
-        .and_then(|d| d.decode())
+        .and_then(|d| d.deserialize())
         .unwrap_or_else(|e| e.exit());
 
     db::init();

@@ -4,8 +4,9 @@ version = "0.1.2"
 authors = ["Nathan Sizemore <nathanrsizemore@gmail.com>"]
 
 [dependencies]
-docopt = "^0.7"
-lazy_static = "^0.2"
-pad = "^0.1"
-rustc-serialize = "^0.3"
-sqlite = "^0.23"
+docopt = "0.8"
+lazy_static = "1.0"
+pad = "0.1"
+serde = "1.0"
+serde_derive = "1.0"
+sqlite = "0.23"
